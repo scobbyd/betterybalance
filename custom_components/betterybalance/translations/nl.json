@@ -1,0 +1,462 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "BetteryBalance instellen",
+        "description": "BetteryBalance zoekt in Home Assistant een Solarman-omvormer met een batterij."
+      },
+      "device": {
+        "title": "Je omvormer",
+        "description": "Home Assistant heeft meer dan één Solarman-omvormer met een batterij. Kies de omvormer die BetteryBalance volgt.",
+        "data": {
+          "device": "Omvormer"
+        }
+      },
+      "inverter": {
+        "title": "Je omvormer",
+        "description": "Uitgelezen uit je omvormer, pas het aan als je het beter weet. Netstromen: {grid_note}.",
+        "data": {
+          "capacity_kwh": "Bruikbare capaciteit",
+          "charge_kw": "Laadvermogen",
+          "discharge_kw": "Ontlaadvermogen",
+          "soc_floor_pct": "Laagste laadtoestand",
+          "grid_import_kwh": "Afnametellers van de netmeter",
+          "grid_export_kwh": "Teruglevertellers van de netmeter"
+        },
+        "data_description": {
+          "grid_import_kwh": "Laat beide netmetervelden leeg om de eigen tellers van de omvormer te gebruiken.",
+          "grid_export_kwh": "Geef de teruglevertellers samen met de afnametellers op."
+        }
+      },
+      "location_contract": {
+        "title": "Je locatie en contract",
+        "description": "De standaardwaarden van Balans, pas ze aan als je contract afwijkt. De belastingmodus gaat op 2027-01-01 naar Geen, als de salderingsregeling stopt. {grid_warning}",
+        "data": {
+          "location": "Locatie",
+          "fee_import_ct": "Opslag op afname",
+          "fee_export_ct": "Opslag op teruglevering",
+          "dual_pricing": "Tweeprijzensysteem",
+          "btw_pct": "BTW",
+          "tax_mode": "Belastingmodus",
+          "balans_revenue_eur_month": "Balans-vergoeding per maand"
+        },
+        "data_description": {
+          "location": "De weerdienst ziet dit punt, niets nauwkeurigers.",
+          "dual_pricing": "Reken een kwartier af tegen twee prijzen als TenneT er twee publiceert.",
+          "tax_mode": "Netto terugleveraar: je levert over het jaar meer terug dan je afneemt. Netto afnemer: andersom. Geen: geen saldering.",
+          "balans_revenue_eur_month": "Optioneel. Het grootboek toont het als eigen regel en telt het nooit op bij het resultaat van de schaduw."
+        }
+      },
+      "pv": {
+        "title": "Je zonnepanelen",
+        "description": "Hoe BetteryBalance je panelen leert kennen.",
+        "menu_options": {
+          "pv_learn": "Leren uit de data",
+          "pv_fill": "Zelf invullen"
+        },
+        "menu_option_descriptions": {
+          "pv_learn": "De integratie leidt de oriëntatie en grootte van elke string af uit wat je omvormer heeft gemeten. Het eerste model wordt direct na de installatie geschat uit de geschiedenis van de recorder en wordt bij elke wekelijkse herberekening beter.",
+          "pv_fill": "Je eigen cijfers geven vanaf dag één betere voorspellingen; de integratie kalibreert de schaal nog steeds."
+        }
+      },
+      "pv_fill": {
+        "title": "Je zonnepanelen",
+        "description": "Eén rij per string die je omvormer meldt, en één voor de GEN-poort als daar een micro-omvormer op zit. Een piekvermogen van 0 slaat een string over. Je eigen cijfers geven vanaf dag één betere voorspellingen; de integratie kalibreert de schaal nog steeds.",
+        "data": {
+          "tilt_1": "String 1 hellingshoek",
+          "azimuth_1": "String 1 azimut",
+          "kwp_1": "String 1 piekvermogen",
+          "tilt_2": "String 2 hellingshoek",
+          "azimuth_2": "String 2 azimut",
+          "kwp_2": "String 2 piekvermogen",
+          "tilt_3": "String 3 hellingshoek",
+          "azimuth_3": "String 3 azimut",
+          "kwp_3": "String 3 piekvermogen",
+          "tilt_4": "String 4 hellingshoek",
+          "azimuth_4": "String 4 azimut",
+          "kwp_4": "String 4 piekvermogen",
+          "tilt_5": "String 5 hellingshoek",
+          "azimuth_5": "String 5 azimut",
+          "kwp_5": "String 5 piekvermogen",
+          "tilt_6": "String 6 hellingshoek",
+          "azimuth_6": "String 6 azimut",
+          "kwp_6": "String 6 piekvermogen",
+          "tilt_7": "String 7 hellingshoek",
+          "azimuth_7": "String 7 azimut",
+          "kwp_7": "String 7 piekvermogen",
+          "tilt_8": "String 8 hellingshoek",
+          "azimuth_8": "String 8 azimut",
+          "kwp_8": "String 8 piekvermogen",
+          "tilt_gen": "GEN-poort hellingshoek",
+          "azimuth_gen": "GEN-poort azimut",
+          "kwp_gen": "GEN-poort piekvermogen"
+        },
+        "data_description": {
+          "azimuth_1": "Kompasgraden: 90 is oost, 180 zuid, 270 west.",
+          "azimuth_2": "Kompasgraden: 90 is oost, 180 zuid, 270 west.",
+          "azimuth_3": "Kompasgraden: 90 is oost, 180 zuid, 270 west.",
+          "azimuth_4": "Kompasgraden: 90 is oost, 180 zuid, 270 west.",
+          "azimuth_5": "Kompasgraden: 90 is oost, 180 zuid, 270 west.",
+          "azimuth_6": "Kompasgraden: 90 is oost, 180 zuid, 270 west.",
+          "azimuth_7": "Kompasgraden: 90 is oost, 180 zuid, 270 west.",
+          "azimuth_8": "Kompasgraden: 90 is oost, 180 zuid, 270 west.",
+          "azimuth_gen": "Kompasgraden: 90 is oost, 180 zuid, 270 west.",
+          "kwp_1": "0 slaat deze string over.",
+          "kwp_2": "0 slaat deze string over.",
+          "kwp_3": "0 slaat deze string over.",
+          "kwp_4": "0 slaat deze string over.",
+          "kwp_5": "0 slaat deze string over.",
+          "kwp_6": "0 slaat deze string over.",
+          "kwp_7": "0 slaat deze string over.",
+          "kwp_8": "0 slaat deze string over.",
+          "kwp_gen": "0 slaat deze string over."
+        }
+      },
+      "backtest": {
+        "title": "De backtest",
+        "description": "Laat de schaduwbatterij opnieuw draaien over je uurgeschiedenis met de prijsgeschiedenis van het datapakket; indicatief, omdat uurdata de kwartieren afvlakt; in het referentiehuis kwam het uurresultaat uit op 93 % van het minuutresultaat. {start} {reason}",
+        "data": {
+          "run_backtest": "De backtest draaien"
+        }
+      }
+    },
+    "error": {
+      "grid_pair": "Geef de afname- en teruglevertellers van de netmeter samen op, of laat beide leeg.",
+      "floor_range": "De laagste laadtoestand moet 95 % of minder zijn.",
+      "no_planes": "Geef ten minste één string een piekvermogen boven 0, of ga terug en laat de integratie de panelen leren."
+    },
+    "abort": {
+      "no_solarman": "BetteryBalance heeft de Solarman-integratie (davidrapan/ha-solarman) nodig met een Deye SUN-12K-SG04LP3 hybride omvormer op het profiel deye_p3. Andere omvormers staan gepland voor plan 4: {issue_url}",
+      "no_battery": "Geen enkele Solarman-omvormer in Home Assistant heeft een batterij. BetteryBalance ondersteunt de Deye SUN-12K-SG04LP3 met een batterij op het profiel deye_p3. Andere opstellingen staan gepland voor plan 4: {issue_url}",
+      "old_integration": "Dit is de oudere Solarman-integratie ({detail}). BetteryBalance ondersteunt davidrapan/ha-solarman met de Deye SUN-12K-SG04LP3 op het profiel deye_p3. Andere opstellingen staan gepland voor plan 4: {issue_url}",
+      "single_phase": "Deze omvormer is eenfasig (geen {detail}). BetteryBalance ondersteunt de driefasige Deye SUN-12K-SG04LP3 op het profiel deye_p3. Andere omvormers staan gepland voor plan 4: {issue_url}",
+      "high_voltage": "Dit is een hoogspanningsbatterij ({detail}). BetteryBalance ondersteunt de Deye SUN-12K-SG04LP3 met een 48V-batterij. Andere opstellingen staan gepland voor plan 4: {issue_url}",
+      "missing_entity": "Een entiteit van het profiel deye_p3 ontbreekt of heeft geen waarde: {detail}. BetteryBalance ondersteunt de Deye SUN-12K-SG04LP3 op het profiel deye_p3 van davidrapan/ha-solarman. Andere opstellingen staan gepland voor plan 4: {issue_url}",
+      "already_configured": "BetteryBalance volgt deze omvormer al.",
+      "already_in_progress": "BetteryBalance wordt voor deze omvormer al ingesteld.",
+      "single_instance_allowed": "BetteryBalance is al ingesteld. Eén Home Assistant draait één BetteryBalance-item."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opties van BetteryBalance",
+        "menu_options": {
+          "advanced": "Geavanceerd",
+          "feeds": "Bronnen",
+          "export": "Export",
+          "pack": "Datapakket",
+          "view": "Kant-en-klare weergave",
+          "backtest": "De backtest draaien"
+        }
+      },
+      "advanced": {
+        "title": "Geavanceerd",
+        "description": "De instellingen van de regel, ingevuld met de meegeleverde standaardwaarden. Wijzig ze alleen als je weet waarom.",
+        "data": {
+          "hurdle_ct_kwh": "Drempel",
+          "wear_eur_cycle": "Slijtage per cyclus",
+          "q_take": "Kwantiel afname",
+          "q_feed": "Kwantiel teruglevering",
+          "predicted_widen": "Verbreding voorspelde prijs",
+          "terminal_target": "Eindlaaddoel",
+          "latency_s": "Vertraging",
+          "dwell_s": "Wachttijd",
+          "trade_floor_w": "Minimaal handelsvermogen",
+          "kappa": "Kappa",
+          "latest_commit_min": "Laatste beslisminuut",
+          "impl": "Drempelmethode",
+          "commit_rule": "Beslisregel",
+          "dual_penalty": "Strafterm voor twee prijzen",
+          "boundary_precommit": "Vooraf beslissen op de kwartiergrens",
+          "second_plane_penalty": "Strafterm voor een tweede vlak",
+          "promotion_margin": "Promotiemarge",
+          "drift_alarm": "Driftalarm",
+          "learning_widen": "Verbreding tijdens het leren",
+          "weekday_split": "Werkdagen apart",
+          "standby": "Stand-byverbruik"
+        },
+        "data_description": {
+          "hurdle_ct_kwh": "Kleinste prijsverschil in ct/kWh dat een handel waard is, na tarieven, belasting en verliezen.",
+          "wear_eur_cycle": "Batterijslijtage in EUR per volledige cyclus, aangerekend op elke kWh die de batterij ontlaadt.",
+          "q_take": "Kwantiel van de afnameprijsband waar een laadactie onder moet blijven (lager is voorzichtiger).",
+          "q_feed": "Kwantiel van de terugleverprijsband waar een ontlaadactie boven moet komen (hoger is voorzichtiger).",
+          "predicted_widen": "Factor die de prijsbanden verbreedt van uren waarvan de day-aheadprijs nog niet bekend is.",
+          "terminal_target": "Laadtoestand waar het plan aan het eind van zijn venster op mikt.",
+          "latency_s": "Seconden tussen een beslissing en het moment dat de batterij die volgt.",
+          "dwell_s": "Seconden dat de batterij een actie vasthoudt voordat die mag omkeren.",
+          "trade_floor_w": "Kleinste batterijvermogen in W voor een handel; kleinere opdrachten worden stilstand.",
+          "kappa": "Marge, in halve bandbreedtes, waarmee de liveprijs de drempel moet passeren om te beslissen.",
+          "latest_commit_min": "Laatste minuut van een kwartier waarop een handel nog mag starten.",
+          "impl": "Drempelmethode: dp (dynamisch programmeren) of ranking.",
+          "commit_rule": "Beslistoets: margin ten opzichte van de band, of expected_gain.",
+          "dual_penalty": "Alleen ranking: geef kwartieren die tegen twee prijzen kunnen afrekenen een strafterm.",
+          "boundary_precommit": "Beslis op een kwartiergrens op basis van de banden, voor de eerste liveprijs.",
+          "second_plane_penalty": "Relatieve fitfout die een tweede PV-vlak moet besparen voordat het PV-model het opneemt.",
+          "promotion_margin": "Fractie waarmee een nieuw sitemodel het huidige moet verslaan om het te vervangen.",
+          "drift_alarm": "Wekelijkse fout in de PV-voorspelling die het driftalarm laat afgaan.",
+          "learning_widen": "Alleen ranking: factor die de behoefte verbreedt zolang de sitemodellen leren.",
+          "weekday_split": "Bepaal aparte verbruiksprofielen voor werkdagen en weekenden.",
+          "standby": "Reken het stand-byverbruik van de omvormer toe aan de schaduwbatterij."
+        }
+      },
+      "feeds": {
+        "title": "Bronnen",
+        "description": "Een optionele API-sleutel van TenneT geeft toegang tot de live balansprijs per 12 seconden. Zonder sleutel draait de bron per minuut. De prijzen van de intraday-veilingen (IDA1 tot IDA3) komen van het dataportaal van Nord Pool, waarvan de voorwaarden automatisch ophalen niet toestaan zolang het project dat niet met Nord Pool heeft geregeld. Het ophalen staat standaard uit, en het prijsmodel werkt dan zonder deze prijzen. Zet het alleen aan als je de voorwaarden voor je eigen gebruik hebt nagekeken.",
+        "data": {
+          "tennet_key": "API-sleutel van TenneT",
+          "fetch_ida": "Intraday-veilingprijzen ophalen bij Nord Pool"
+        }
+      },
+      "export": {
+        "title": "Export",
+        "description": "Wat de export van het grootboek bevat.",
+        "data": {
+          "export_flows": "De minuutstromen meenemen",
+          "pool_results": "Het resultatenbestand toestaan voor bundeling"
+        },
+        "data_description": {
+          "export_flows": "Uit: de export bevat het grootboek zonder de stromen van je huishouden.",
+          "pool_results": "Uit: de dienst export_results weigert."
+        }
+      },
+      "pack": {
+        "title": "Datapakket",
+        "description": "De lokale map of file://-URL waar de releases van het datapakket vandaan komen. Laat het leeg om updates te stoppen; een geïnstalleerd pakket blijft rekenen.",
+        "data": {
+          "pack_source": "Pakketbron"
+        }
+      },
+      "view": {
+        "title": "Kant-en-klare weergave",
+        "description": "Voeg een dashboardweergave toe met deze strategie:\n\n```\n{snippet}\n```\n\nOf kopieer de YAML-weergave uit {path}."
+      },
+      "backtest": {
+        "title": "De backtest draaien",
+        "description": "Laat de schaduwbatterij opnieuw draaien over je uurgeschiedenis met de meegeleverde prijsgeschiedenis. De berekening start als je verzendt; de backtestsensor toont de voortgang."
+      }
+    },
+    "error": {
+      "knob_range": "Deze instelling moet tussen 0 en 1 liggen.",
+      "knob_invalid": "Een instelling heeft een waarde die de regel niet accepteert.",
+      "not_a_pack_source": "Hier staat geen leesbare datapakket-release: geef een map of file://-URL met manifest.json op.",
+      "commit_minute_range": "De laatste beslisminuut moet tussen 0 en 14 liggen.",
+      "widen_range": "Een verbredingsfactor moet 1 of meer zijn.",
+      "latency_range": "De vertraging moet tussen 0 en 300 seconden liggen.",
+      "dwell_range": "De wachttijd moet tussen 0 en 900 seconden liggen.",
+      "knob_integer": "Deze instelling accepteert alleen gehele getallen."
+    },
+    "abort": {
+      "backtest_unavailable": "De backtest kan niet starten: {reason}.",
+      "backtest_refused": "De backtest is geweigerd: {reason}."
+    }
+  },
+  "selector": {
+    "tax_mode": {
+      "options": {
+        "net_exporter": "Netto terugleveraar",
+        "net_importer": "Netto afnemer",
+        "none": "Geen"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "state": {
+        "name": "Actie",
+        "state": {
+          "hold": "Stilstand",
+          "charge": "Laden",
+          "discharge": "Ontladen"
+        }
+      },
+      "plan": {
+        "name": "Planning"
+      },
+      "result_today": {
+        "name": "Resultaat vandaag"
+      },
+      "result": {
+        "name": "Resultaat"
+      },
+      "result_provisional": {
+        "name": "Voorlopig resultaat"
+      },
+      "shadow_soc": {
+        "name": "Laadtoestand schaduwbatterij"
+      },
+      "take_nowcast": {
+        "name": "Actuele schatting afnameprijs"
+      },
+      "feed_nowcast": {
+        "name": "Actuele schatting terugleverprijs"
+      },
+      "pv_expected": {
+        "name": "Verwacht PV-vermogen"
+      },
+      "backtest": {
+        "name": "Backtest",
+        "state": {
+          "idle": "Inactief",
+          "running": "Bezig",
+          "done": "Klaar",
+          "failed": "Mislukt"
+        }
+      }
+    },
+    "binary_sensor": {
+      "feed_day_ahead": {
+        "name": "Bron day-aheadprijzen"
+      },
+      "feed_ida": {
+        "name": "Bron intraday-veiling"
+      },
+      "feed_settlement": {
+        "name": "Bron onbalansafrekening"
+      },
+      "feed_live": {
+        "name": "Bron live onbalansprijs"
+      },
+      "feed_irradiance": {
+        "name": "Bron weersverwachting"
+      },
+      "feed_pack": {
+        "name": "Bron datapakket"
+      }
+    },
+    "select": {
+      "period": {
+        "name": "Resultaatperiode",
+        "state": {
+          "day": "Dag",
+          "week": "Week",
+          "month": "Maand",
+          "year": "Jaar"
+        }
+      }
+    }
+  },
+  "services": {
+    "run_backtest": {
+      "name": "De backtest draaien",
+      "description": "Laat de schaduwbatterij opnieuw draaien over je uurgeschiedenis met de meegeleverde prijsgeschiedenis. De backtestsensor toont de voortgang.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Integratie-item",
+          "description": "Het integratie-item van BetteryBalance. Laat het leeg als er maar één is ingesteld."
+        }
+      }
+    },
+    "export_ledger": {
+      "name": "Het grootboek exporteren",
+      "description": "Schrijft het handelsgrootboek van de dagen van en tot naar een map onder betterybalance/exports in je configuratiemap.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Integratie-item",
+          "description": "Het integratie-item van BetteryBalance. Laat het leeg als er maar één is ingesteld."
+        },
+        "from": {
+          "name": "Van",
+          "description": "De eerste dag, inbegrepen."
+        },
+        "to": {
+          "name": "Tot",
+          "description": "De laatste dag, inbegrepen."
+        },
+        "include_flows": {
+          "name": "De minuutstromen meenemen",
+          "description": "Voegt de minuutstromen van je huishouden toe, hoogstens 31 dagen per export. Laat het weg om de exportoptie te volgen."
+        }
+      }
+    },
+    "export_results": {
+      "name": "De resultaten exporteren",
+      "description": "Schrijft het geanonimiseerde resultatenbestand voor bundeling naar betterybalance/exports. Het wordt geweigerd tenzij de exportopties bundeling toestaan.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Integratie-item",
+          "description": "Het integratie-item van BetteryBalance. Laat het leeg als er maar één is ingesteld."
+        }
+      }
+    },
+    "refit_site_models": {
+      "name": "Sitemodellen opnieuw bepalen",
+      "description": "Bepaalt de modellen voor zon, verbruik en EV nu opnieuw uit je data, in plaats van 's nachts.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Integratie-item",
+          "description": "Het integratie-item van BetteryBalance. Laat het leeg als er maar één is ingesteld."
+        }
+      }
+    },
+    "verify_ledger": {
+      "name": "Het grootboek controleren",
+      "description": "Controleert de keten, de afgerekende prijzen, de bedragen en de energie van het grootboek voor de dagen van en tot, en meldt de uitkomst in een melding.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Integratie-item",
+          "description": "Het integratie-item van BetteryBalance. Laat het leeg als er maar één is ingesteld."
+        },
+        "from": {
+          "name": "Van",
+          "description": "De eerste dag, inbegrepen."
+        },
+        "to": {
+          "name": "Tot",
+          "description": "De laatste dag, inbegrepen."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "no_pack": {
+      "message": "Er is nog geen datapakket geïnstalleerd. Stel eerst de pakketbron in bij de opties onder Datapakket."
+    },
+    "short_history": {
+      "message": "De recorder bevat minder dan 14 dagen aan uurstatistieken van de nettellers."
+    },
+    "backtest_running": {
+      "message": "Er loopt al een backtest. Wacht tot die klaar is."
+    },
+    "backtest_stopping": {
+      "message": "BetteryBalance stopt, dus er start nu geen backtest. Start hem opnieuw nadat de integratie geladen is."
+    },
+    "no_end_soc": {
+      "message": "Het laatste uur van de backtestperiode heeft geen laadtoestand van de batterij in de recorder, dus het einde van de run kan niet gewaardeerd worden. Probeer het opnieuw nadat het volgende volle uur is vastgelegd."
+    },
+    "pooling_off": {
+      "message": "Bundeling staat uit. Sta eerst het resultatenbestand voor bundeling toe bij de opties onder Export."
+    },
+    "not_loaded": {
+      "message": "BetteryBalance is niet geladen."
+    },
+    "several_loaded": {
+      "message": "Er zijn meerdere BetteryBalance-items geladen. Vul {field} in om er één te kiezen."
+    },
+    "export_order": {
+      "message": "De eerste dag ({from}) moet op of voor de laatste dag ({to}) liggen."
+    },
+    "export_dates": {
+      "message": "De datums {from} tot {to} liggen buiten het bereik."
+    },
+    "export_flow_days": {
+      "message": "Minuutstromen beslaan hoogstens {max_days} dagen per export, en er zijn {days} gevraagd."
+    },
+    "refit_failed": {
+      "message": "Het opnieuw bepalen van de sitemodellen is mislukt: {error}"
+    },
+    "verify_failed": {
+      "message": "De controle van het grootboek kon niet worden uitgevoerd: {error}"
+    }
+  },
+  "issues": {
+    "pv_scale_off": {
+      "title": "Cijfers van de zonnepanelen wijken af van de meting",
+      "description": "De geschatte schaal van string {strings} ligt meer dan 25 % af van het piekvermogen dat je invulde. De voorspellingen volgen de geschatte schaal. Controleer de cijfers die je voor deze strings invulde."
+    },
+    "minute_loop_failed": {
+      "title": "BetteryBalance handelt niet meer",
+      "description": "De minuutlus van de schaduwhandelaar blijft mislukken: {error}. Hij probeert het hooguit elke 15 minuten opnieuw, en deze melding verdwijnt zodra een poging lukt. Het logboek van Home Assistant bevat de details."
+    }
+  }
+}

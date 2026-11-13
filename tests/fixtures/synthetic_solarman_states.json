@@ -1,0 +1,104 @@
+[
+ {
+  "entity_id": "number.synthetic_battery_capacity",
+  "state": "600",
+  "attributes": {
+   "unit_of_measurement": "Ah"
+  }
+ },
+ {
+  "entity_id": "number.synthetic_battery_max_charging_current",
+  "state": "240",
+  "attributes": {
+   "unit_of_measurement": "A"
+  }
+ },
+ {
+  "entity_id": "number.synthetic_battery_max_discharging_current",
+  "state": "240",
+  "attributes": {
+   "unit_of_measurement": "A"
+  }
+ },
+ {
+  "entity_id": "number.synthetic_battery_shutdown_soc",
+  "state": "10",
+  "attributes": {
+   "unit_of_measurement": "%"
+  }
+ },
+ {
+  "entity_id": "number.synthetic_battery_low_soc",
+  "state": "20",
+  "attributes": {
+   "unit_of_measurement": "%"
+  }
+ },
+ {
+  "entity_id": "sensor.synthetic_battery_voltage",
+  "state": "51.2",
+  "attributes": {
+   "unit_of_measurement": "V"
+  }
+ },
+ {
+  "entity_id": "sensor.synthetic_battery",
+  "state": "50",
+  "attributes": {
+   "unit_of_measurement": "%",
+   "BMS Max Charging Current": 300,
+   "BMS Max Discharging Current": 300
+  }
+ },
+ {
+  "entity_id": "select.synthetic_io_mode",
+  "state": "Microinverter",
+  "attributes": {
+   "options": [
+    "Generator",
+    "SmartLoad",
+    "Microinverter"
+   ]
+  }
+ },
+ {
+  "entity_id": "sensor.synthetic_p1_energy_import_tariff_1",
+  "state": "1234.5",
+  "attributes": {
+   "unit_of_measurement": "kWh",
+   "state_class": "total_increasing"
+  }
+ },
+ {
+  "entity_id": "sensor.synthetic_p1_energy_import_tariff_2",
+  "state": "2345.6",
+  "attributes": {
+   "unit_of_measurement": "kWh",
+   "state_class": "total_increasing"
+  }
+ },
+ {
+  "entity_id": "sensor.synthetic_p1_energy_export_tariff_1",
+  "state": "345.6",
+  "attributes": {
+   "unit_of_measurement": "kWh",
+   "state_class": "total_increasing"
+  }
+ },
+ {
+  "entity_id": "sensor.synthetic_p1_energy_export_tariff_2",
+  "state": "456.7",
+  "attributes": {
+   "unit_of_measurement": "kWh",
+   "state_class": "total_increasing"
+  }
+ },
+ {
+  "entity_id": "sensor.synthetic_p1_power_consumption",
+  "state": "0.4",
+  "attributes": {
+   "unit_of_measurement": "kW",
+   "state_class": "measurement"
+  }
+ }
+]

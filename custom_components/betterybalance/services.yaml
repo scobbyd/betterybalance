@@ -1,0 +1,63 @@
+run_backtest:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: betterybalance
+
+export_ledger:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: betterybalance
+    from:
+      required: true
+      example: "2026-11-02"
+      selector:
+        date:
+    to:
+      required: true
+      example: "2026-11-02"
+      selector:
+        date:
+    include_flows:
+      required: false
+      selector:
+        boolean:
+
+export_results:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: betterybalance
+
+refit_site_models:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: betterybalance
+
+verify_ledger:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: betterybalance
+    from:
+      required: true
+      example: "2026-11-02"
+      selector:
+        date:
+    to:
+      required: true
+      example: "2026-11-02"
+      selector:
+        date:

@@ -1,0 +1,462 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up BetteryBalance",
+        "description": "BetteryBalance looks for a Solarman inverter with a battery in Home Assistant."
+      },
+      "device": {
+        "title": "Your inverter",
+        "description": "Home Assistant has more than one Solarman inverter with a battery. Choose the one BetteryBalance follows.",
+        "data": {
+          "device": "Inverter"
+        }
+      },
+      "inverter": {
+        "title": "Your inverter",
+        "description": "Read from your inverter, change it if you know better. Grid flows: {grid_note}.",
+        "data": {
+          "capacity_kwh": "Usable capacity",
+          "charge_kw": "Charge power",
+          "discharge_kw": "Discharge power",
+          "soc_floor_pct": "Lowest state of charge",
+          "grid_import_kwh": "Grid meter import counters",
+          "grid_export_kwh": "Grid meter export counters"
+        },
+        "data_description": {
+          "grid_import_kwh": "Leave both grid meter fields empty to use the inverter's own counters.",
+          "grid_export_kwh": "Give the export counters together with the import counters."
+        }
+      },
+      "location_contract": {
+        "title": "Your location and contract",
+        "description": "The Balans defaults, change them if your contract differs. The tax mode switches to none on 2027-01-01, when salderen ends. {grid_warning}",
+        "data": {
+          "location": "Location",
+          "fee_import_ct": "Import fee",
+          "fee_export_ct": "Export fee",
+          "dual_pricing": "Dual pricing",
+          "btw_pct": "BTW",
+          "tax_mode": "Tax mode",
+          "balans_revenue_eur_month": "Monthly Balans revenue"
+        },
+        "data_description": {
+          "location": "The weather service sees this point, nothing finer.",
+          "dual_pricing": "Settle a quarter at two prices when TenneT publishes two.",
+          "tax_mode": "Net exporter: you export more than you import over the year. Net importer: the other way round. None: no salderen.",
+          "balans_revenue_eur_month": "Optional. The ledger shows it as its own line and never adds it to the shadow's result."
+        }
+      },
+      "pv": {
+        "title": "Your solar panels",
+        "description": "How BetteryBalance learns your panels.",
+        "menu_options": {
+          "pv_learn": "Learn from the data",
+          "pv_fill": "Fill in"
+        },
+        "menu_option_descriptions": {
+          "pv_learn": "The integration fits the orientation and size of each string to what your inverter measured. The first model is fitted from the recorder's history right after setup and improves with each weekly refit.",
+          "pv_fill": "Your own numbers give better forecasts from day one; the integration still calibrates the scale."
+        }
+      },
+      "pv_fill": {
+        "title": "Your solar panels",
+        "description": "One row per string your inverter reports, and one for the GEN port when a microinverter feeds it. A peak power of 0 skips a string. Your own numbers give better forecasts from day one; the integration still calibrates the scale.",
+        "data": {
+          "tilt_1": "String 1 tilt",
+          "azimuth_1": "String 1 azimuth",
+          "kwp_1": "String 1 peak power",
+          "tilt_2": "String 2 tilt",
+          "azimuth_2": "String 2 azimuth",
+          "kwp_2": "String 2 peak power",
+          "tilt_3": "String 3 tilt",
+          "azimuth_3": "String 3 azimuth",
+          "kwp_3": "String 3 peak power",
+          "tilt_4": "String 4 tilt",
+          "azimuth_4": "String 4 azimuth",
+          "kwp_4": "String 4 peak power",
+          "tilt_5": "String 5 tilt",
+          "azimuth_5": "String 5 azimuth",
+          "kwp_5": "String 5 peak power",
+          "tilt_6": "String 6 tilt",
+          "azimuth_6": "String 6 azimuth",
+          "kwp_6": "String 6 peak power",
+          "tilt_7": "String 7 tilt",
+          "azimuth_7": "String 7 azimuth",
+          "kwp_7": "String 7 peak power",
+          "tilt_8": "String 8 tilt",
+          "azimuth_8": "String 8 azimuth",
+          "kwp_8": "String 8 peak power",
+          "tilt_gen": "GEN port tilt",
+          "azimuth_gen": "GEN port azimuth",
+          "kwp_gen": "GEN port peak power"
+        },
+        "data_description": {
+          "azimuth_1": "Compass degrees: 90 is east, 180 south, 270 west.",
+          "azimuth_2": "Compass degrees: 90 is east, 180 south, 270 west.",
+          "azimuth_3": "Compass degrees: 90 is east, 180 south, 270 west.",
+          "azimuth_4": "Compass degrees: 90 is east, 180 south, 270 west.",
+          "azimuth_5": "Compass degrees: 90 is east, 180 south, 270 west.",
+          "azimuth_6": "Compass degrees: 90 is east, 180 south, 270 west.",
+          "azimuth_7": "Compass degrees: 90 is east, 180 south, 270 west.",
+          "azimuth_8": "Compass degrees: 90 is east, 180 south, 270 west.",
+          "azimuth_gen": "Compass degrees: 90 is east, 180 south, 270 west.",
+          "kwp_1": "0 skips this string.",
+          "kwp_2": "0 skips this string.",
+          "kwp_3": "0 skips this string.",
+          "kwp_4": "0 skips this string.",
+          "kwp_5": "0 skips this string.",
+          "kwp_6": "0 skips this string.",
+          "kwp_7": "0 skips this string.",
+          "kwp_8": "0 skips this string.",
+          "kwp_gen": "0 skips this string."
+        }
+      },
+      "backtest": {
+        "title": "The backtest",
+        "description": "Replays the shadow battery over your hourly history with the price history of the data pack; indicative, because hourly data flattens the quarters; on the reference house the hourly result was 93 % of the minute result. {start} {reason}",
+        "data": {
+          "run_backtest": "Run the backtest"
+        }
+      }
+    },
+    "error": {
+      "grid_pair": "Give the grid meter's import and export counters together, or leave both empty.",
+      "floor_range": "The lowest state of charge must be 95 % or less.",
+      "no_planes": "Give at least one string a peak power above 0, or go back and let the integration learn the panels."
+    },
+    "abort": {
+      "no_solarman": "BetteryBalance needs the Solarman integration (davidrapan/ha-solarman) with a Deye SUN-12K-SG04LP3 hybrid inverter on the deye_p3 profile. Other inverters are planned for plan 4: {issue_url}",
+      "no_battery": "No Solarman inverter in Home Assistant has a battery. BetteryBalance supports the Deye SUN-12K-SG04LP3 with a battery on the deye_p3 profile. Other set-ups are planned for plan 4: {issue_url}",
+      "old_integration": "This is the older Solarman integration ({detail}). BetteryBalance supports davidrapan/ha-solarman with the Deye SUN-12K-SG04LP3 on the deye_p3 profile. Other set-ups are planned for plan 4: {issue_url}",
+      "single_phase": "This inverter is single-phase (no {detail}). BetteryBalance supports the three-phase Deye SUN-12K-SG04LP3 on the deye_p3 profile. Other inverters are planned for plan 4: {issue_url}",
+      "high_voltage": "This is a high-voltage battery ({detail}). BetteryBalance supports the Deye SUN-12K-SG04LP3 with a 48 V battery. Other set-ups are planned for plan 4: {issue_url}",
+      "missing_entity": "An entity of the deye_p3 profile is missing or has no value: {detail}. BetteryBalance supports the Deye SUN-12K-SG04LP3 on the deye_p3 profile of davidrapan/ha-solarman. Other set-ups are planned for plan 4: {issue_url}",
+      "already_configured": "BetteryBalance already follows this inverter.",
+      "already_in_progress": "BetteryBalance is already being set up for this inverter.",
+      "single_instance_allowed": "BetteryBalance is already set up. One Home Assistant runs one BetteryBalance entry."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "BetteryBalance options",
+        "menu_options": {
+          "advanced": "Advanced",
+          "feeds": "Feeds",
+          "export": "Export",
+          "pack": "Data pack",
+          "view": "Ready-made view",
+          "backtest": "Run the backtest"
+        }
+      },
+      "advanced": {
+        "title": "Advanced",
+        "description": "The rule's knobs, prefilled with the shipped defaults. Change them only when you know why.",
+        "data": {
+          "hurdle_ct_kwh": "Hurdle",
+          "wear_eur_cycle": "Wear per cycle",
+          "q_take": "Take quantile",
+          "q_feed": "Feed quantile",
+          "predicted_widen": "Predicted-price widening",
+          "terminal_target": "Terminal target",
+          "latency_s": "Latency",
+          "dwell_s": "Dwell",
+          "trade_floor_w": "Trade floor",
+          "kappa": "Kappa",
+          "latest_commit_min": "Latest commit minute",
+          "impl": "Threshold method",
+          "commit_rule": "Commit rule",
+          "dual_penalty": "Dual-price penalty",
+          "boundary_precommit": "Boundary pre-commit",
+          "second_plane_penalty": "Second-plane penalty",
+          "promotion_margin": "Promotion margin",
+          "drift_alarm": "Drift alarm",
+          "learning_widen": "Learning widening",
+          "weekday_split": "Weekday split",
+          "standby": "Standby drain"
+        },
+        "data_description": {
+          "hurdle_ct_kwh": "Smallest price spread in ct/kWh worth a trade, after fees, tax and losses.",
+          "wear_eur_cycle": "Battery wear in EUR per full cycle, charged on each kWh the battery discharges.",
+          "q_take": "Quantile of the take-price band that a charge must clear (lower is more careful).",
+          "q_feed": "Quantile of the feed-price band that a discharge must clear (higher is more careful).",
+          "predicted_widen": "Factor that widens the price bands of hours whose day-ahead price is not known.",
+          "terminal_target": "State of charge the plan aims for at the end of its window.",
+          "latency_s": "Seconds between a decision and the battery following it.",
+          "dwell_s": "Seconds the battery holds an action before it may reverse.",
+          "trade_floor_w": "Smallest battery power in W for a trade; smaller orders become hold.",
+          "kappa": "Margin, in band half-widths, by which the live price must clear the threshold to commit.",
+          "latest_commit_min": "Last minute of a quarter at which a trade may still start.",
+          "impl": "Threshold method: dp (dynamic programming) or ranking.",
+          "commit_rule": "Commit test: margin against the band, or expected_gain.",
+          "dual_penalty": "Ranking only: penalise quarters that may settle at two prices.",
+          "boundary_precommit": "At a quarter boundary, commit from the bands before the first live price.",
+          "second_plane_penalty": "Relative fit error a second PV plane must save before the PV model takes it.",
+          "promotion_margin": "Fraction by which a new site model must beat the current one to replace it.",
+          "drift_alarm": "Weekly PV forecast error that raises the drift alarm.",
+          "learning_widen": "Ranking only: factor that widens the need while the site models learn.",
+          "weekday_split": "Fit separate load profiles for weekdays and weekends.",
+          "standby": "Count the inverter's standby drain against the shadow battery."
+        }
+      },
+      "feeds": {
+        "title": "Feeds",
+        "description": "An optional TenneT API key gives the 12-second live balance feed. Without one the minute feed runs. The intraday auction prices (IDA1 to IDA3) come from Nord Pool's data portal, whose terms do not allow automated extraction until the project has settled them with Nord Pool. The fetch is off by default, and the price model then works without them. Switch it on only when you have checked the terms for your own use.",
+        "data": {
+          "tennet_key": "TenneT API key",
+          "fetch_ida": "Fetch the intraday auction prices from Nord Pool"
+        }
+      },
+      "export": {
+        "title": "Export",
+        "description": "What the ledger export holds.",
+        "data": {
+          "export_flows": "Include the minute flows",
+          "pool_results": "Allow the results file for pooling"
+        },
+        "data_description": {
+          "export_flows": "Off: the export holds the ledger without your household's flows.",
+          "pool_results": "Off: the export_results service refuses."
+        }
+      },
+      "pack": {
+        "title": "Data pack",
+        "description": "The local folder or file:// URL the data pack releases come from. Leave it empty to stop updates; an installed pack keeps serving.",
+        "data": {
+          "pack_source": "Pack source"
+        }
+      },
+      "view": {
+        "title": "Ready-made view",
+        "description": "Add a dashboard view with this strategy:\n\n```\n{snippet}\n```\n\nOr copy the YAML view from {path}."
+      },
+      "backtest": {
+        "title": "Run the backtest",
+        "description": "Replays the shadow battery over your hourly history with the shipped price history. The run starts when you submit; the backtest sensor shows its progress."
+      }
+    },
+    "error": {
+      "knob_range": "This knob must lie between 0 and 1.",
+      "knob_invalid": "A knob holds a value the rule does not accept.",
+      "not_a_pack_source": "No readable data pack release here: give a folder or file:// URL that holds manifest.json.",
+      "commit_minute_range": "The latest commit minute must lie between 0 and 14.",
+      "widen_range": "A widening factor must be 1 or more.",
+      "latency_range": "The latency must lie between 0 and 300 seconds.",
+      "dwell_range": "The dwell must lie between 0 and 900 seconds.",
+      "knob_integer": "This knob takes whole numbers only."
+    },
+    "abort": {
+      "backtest_unavailable": "The backtest cannot start: {reason}.",
+      "backtest_refused": "The backtest was refused: {reason}."
+    }
+  },
+  "selector": {
+    "tax_mode": {
+      "options": {
+        "net_exporter": "Net exporter",
+        "net_importer": "Net importer",
+        "none": "None"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "state": {
+        "name": "Action",
+        "state": {
+          "hold": "Hold",
+          "charge": "Charge",
+          "discharge": "Discharge"
+        }
+      },
+      "plan": {
+        "name": "Plan"
+      },
+      "result_today": {
+        "name": "Result today"
+      },
+      "result": {
+        "name": "Result"
+      },
+      "result_provisional": {
+        "name": "Provisional result"
+      },
+      "shadow_soc": {
+        "name": "Shadow state of charge"
+      },
+      "take_nowcast": {
+        "name": "Take price nowcast"
+      },
+      "feed_nowcast": {
+        "name": "Feed price nowcast"
+      },
+      "pv_expected": {
+        "name": "Expected PV power"
+      },
+      "backtest": {
+        "name": "Backtest",
+        "state": {
+          "idle": "Idle",
+          "running": "Running",
+          "done": "Done",
+          "failed": "Failed"
+        }
+      }
+    },
+    "binary_sensor": {
+      "feed_day_ahead": {
+        "name": "Day-ahead price feed"
+      },
+      "feed_ida": {
+        "name": "Intraday auction feed"
+      },
+      "feed_settlement": {
+        "name": "Imbalance settlement feed"
+      },
+      "feed_live": {
+        "name": "Live imbalance price feed"
+      },
+      "feed_irradiance": {
+        "name": "Weather forecast feed"
+      },
+      "feed_pack": {
+        "name": "Data pack feed"
+      }
+    },
+    "select": {
+      "period": {
+        "name": "Results period",
+        "state": {
+          "day": "Day",
+          "week": "Week",
+          "month": "Month",
+          "year": "Year"
+        }
+      }
+    }
+  },
+  "services": {
+    "run_backtest": {
+      "name": "Run the backtest",
+      "description": "Replays the shadow battery over your hourly history with the shipped price history. The backtest sensor shows the progress.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Entry",
+          "description": "The BetteryBalance entry. Leave it empty when only one is set up."
+        }
+      }
+    },
+    "export_ledger": {
+      "name": "Export the ledger",
+      "description": "Writes the trade ledger of the days from and to into a folder under betterybalance/exports in your configuration directory.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Entry",
+          "description": "The BetteryBalance entry. Leave it empty when only one is set up."
+        },
+        "from": {
+          "name": "From",
+          "description": "The first day, included."
+        },
+        "to": {
+          "name": "To",
+          "description": "The last day, included."
+        },
+        "include_flows": {
+          "name": "Include the minute flows",
+          "description": "Adds your household's minute flows, at most 31 days per export. Leave it out to follow the export option."
+        }
+      }
+    },
+    "export_results": {
+      "name": "Export the results",
+      "description": "Writes the anonymised results file for pooling into betterybalance/exports. It is refused unless the export options allow pooling.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Entry",
+          "description": "The BetteryBalance entry. Leave it empty when only one is set up."
+        }
+      }
+    },
+    "refit_site_models": {
+      "name": "Refit the site models",
+      "description": "Fits the solar, load and EV models to your data now instead of at night.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Entry",
+          "description": "The BetteryBalance entry. Leave it empty when only one is set up."
+        }
+      }
+    },
+    "verify_ledger": {
+      "name": "Verify the ledger",
+      "description": "Checks the chain, the settled prices, the money and the energies of the ledger for the days from and to, and reports in a notification.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Entry",
+          "description": "The BetteryBalance entry. Leave it empty when only one is set up."
+        },
+        "from": {
+          "name": "From",
+          "description": "The first day, included."
+        },
+        "to": {
+          "name": "To",
+          "description": "The last day, included."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "no_pack": {
+      "message": "No data pack is installed yet. Set the pack source in the options under Data pack first."
+    },
+    "short_history": {
+      "message": "The recorder holds less than 14 days of hourly statistics for the grid counters."
+    },
+    "backtest_running": {
+      "message": "A backtest is running already. Wait until it is done."
+    },
+    "backtest_stopping": {
+      "message": "BetteryBalance is stopping, so no backtest starts now. Start it again after the integration is loaded."
+    },
+    "no_end_soc": {
+      "message": "The last hour of the backtest span has no battery state of charge in the recorder, so the end of the run cannot be valued. Try again after the next full hour is recorded."
+    },
+    "pooling_off": {
+      "message": "Pooling is off. Allow the results file for pooling in the options under Export first."
+    },
+    "not_loaded": {
+      "message": "BetteryBalance is not loaded."
+    },
+    "several_loaded": {
+      "message": "Several BetteryBalance entries are loaded. Set {field} to choose one."
+    },
+    "export_order": {
+      "message": "The first day ({from}) must be on or before the last day ({to})."
+    },
+    "export_dates": {
+      "message": "The dates {from} to {to} are out of range."
+    },
+    "export_flow_days": {
+      "message": "Minute flows cover at most {max_days} days per export, and {days} were asked."
+    },
+    "refit_failed": {
+      "message": "The site-model refit failed: {error}"
+    },
+    "verify_failed": {
+      "message": "The ledger check could not run: {error}"
+    }
+  },
+  "issues": {
+    "pv_scale_off": {
+      "title": "Solar panel figures differ from the measurement",
+      "description": "The fitted scale of string {strings} lies more than 25 % from the peak power you entered. The forecasts follow the fitted scale. Check the figures you entered for these strings."
+    },
+    "minute_loop_failed": {
+      "title": "BetteryBalance stopped trading",
+      "description": "The minute loop of the shadow trader keeps failing: {error}. It tries again at most every 15 minutes, and this notice goes away when a try succeeds. The Home Assistant log holds the details."
+    }
+  }
+}

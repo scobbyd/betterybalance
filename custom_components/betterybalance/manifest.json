@@ -1,0 +1,15 @@
+{
+  "domain": "betterybalance",
+  "name": "BetteryBalance",
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": ["recorder", "http", "frontend", "lovelace"],
+  "after_dependencies": ["solarman"],
+  "documentation": "https://github.com/scobbyd/betterybalance",
+  "issue_tracker": "https://github.com/scobbyd/betterybalance/issues",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "requirements": ["numpy>=1.26"],
+  "single_config_entry": true,
+  "version": "0.3.0"
+}

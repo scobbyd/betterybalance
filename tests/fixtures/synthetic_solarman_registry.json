@@ -1,0 +1,310 @@
+[
+ {
+  "entity_id": "sensor.synthetic_grid_power",
+  "platform": "solarman",
+  "original_name": "Grid Power",
+  "unique_id": "01jsyntheticentry0000000000_grid_power_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_grid_l2_power",
+  "platform": "solarman",
+  "original_name": "Grid L2 Power",
+  "unique_id": "01jsyntheticentry0000000000_grid_l2_power_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_total_energy_import",
+  "platform": "solarman",
+  "original_name": "Total Energy Import",
+  "unique_id": "01jsyntheticentry0000000000_total_energy_import_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_total_energy_export",
+  "platform": "solarman",
+  "original_name": "Total Energy Export",
+  "unique_id": "01jsyntheticentry0000000000_total_energy_export_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_battery_power",
+  "platform": "solarman",
+  "original_name": "Battery Power",
+  "unique_id": "01jsyntheticentry0000000000_battery_power_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_battery",
+  "platform": "solarman",
+  "original_name": "Battery",
+  "unique_id": "01jsyntheticentry0000000000_battery_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_battery_voltage",
+  "platform": "solarman",
+  "original_name": "Battery Voltage",
+  "unique_id": "01jsyntheticentry0000000000_battery_voltage_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_total_battery_charge",
+  "platform": "solarman",
+  "original_name": "Total Battery Charge",
+  "unique_id": "01jsyntheticentry0000000000_total_battery_charge_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_total_battery_discharge",
+  "platform": "solarman",
+  "original_name": "Total Battery Discharge",
+  "unique_id": "01jsyntheticentry0000000000_total_battery_discharge_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_load_power",
+  "platform": "solarman",
+  "original_name": "Load Power",
+  "unique_id": "01jsyntheticentry0000000000_load_power_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_load_ups_power",
+  "platform": "solarman",
+  "original_name": "Load UPS Power",
+  "unique_id": "01jsyntheticentry0000000000_load_ups_power_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_total_load_consumption",
+  "platform": "solarman",
+  "original_name": "Total Load Consumption",
+  "unique_id": "01jsyntheticentry0000000000_total_load_consumption_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_pv_power",
+  "platform": "solarman",
+  "original_name": "PV Power",
+  "unique_id": "01jsyntheticentry0000000000_pv_power_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_pv1_power",
+  "platform": "solarman",
+  "original_name": "PV1 Power",
+  "unique_id": "01jsyntheticentry0000000000_pv1_power_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_pv2_power",
+  "platform": "solarman",
+  "original_name": "PV2 Power",
+  "unique_id": "01jsyntheticentry0000000000_pv2_power_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_total_production",
+  "platform": "solarman",
+  "original_name": "Total Production",
+  "unique_id": "01jsyntheticentry0000000000_total_production_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_generator_power",
+  "platform": "solarman",
+  "original_name": "Generator Power",
+  "unique_id": "01jsyntheticentry0000000000_generator_power_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_generator_energy",
+  "platform": "solarman",
+  "original_name": "Generator Energy",
+  "unique_id": "01jsyntheticentry0000000000_generator_energy_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "number.synthetic_battery_capacity",
+  "platform": "solarman",
+  "original_name": "Battery Capacity",
+  "unique_id": "01jsyntheticentry0000000000_battery_capacity_number",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "number.synthetic_battery_max_charging_current",
+  "platform": "solarman",
+  "original_name": "Battery Max Charging Current",
+  "unique_id": "01jsyntheticentry0000000000_battery_max_charging_current_number",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "number.synthetic_battery_max_discharging_current",
+  "platform": "solarman",
+  "original_name": "Battery Max Discharging Current",
+  "unique_id": "01jsyntheticentry0000000000_battery_max_discharging_current_number",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "number.synthetic_battery_shutdown_soc",
+  "platform": "solarman",
+  "original_name": "Battery Shutdown SOC",
+  "unique_id": "01jsyntheticentry0000000000_battery_shutdown_soc_number",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "number.synthetic_battery_low_soc",
+  "platform": "solarman",
+  "original_name": "Battery Low SOC",
+  "unique_id": "01jsyntheticentry0000000000_battery_low_soc_number",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "number.synthetic_pv_power",
+  "platform": "solarman",
+  "original_name": "PV Power",
+  "unique_id": "01jsyntheticentry0000000000_pv_power_number",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_battery_capacity",
+  "platform": "solarman",
+  "original_name": "Battery Capacity",
+  "unique_id": "01jsyntheticentry0000000000_battery_capacity_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "switch.synthetic_unnamed",
+  "platform": "solarman",
+  "original_name": "",
+  "unique_id": "01jsyntheticentry0000000000_switch",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_microinverter_power",
+  "platform": "solarman",
+  "original_name": "Microinverter Power",
+  "unique_id": "01jsyntheticentry0000000000_microinverter_power_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_microinverter_energy",
+  "platform": "solarman",
+  "original_name": "Microinverter Energy",
+  "unique_id": "01jsyntheticentry0000000000_microinverter_energy_sensor",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "select.synthetic_io_mode",
+  "platform": "solarman",
+  "original_name": "IO Mode",
+  "unique_id": "01jsyntheticentry0000000000_io_mode_select",
+  "device_id": "dev1",
+  "config_entry_id": "01JSYNTHETICENTRY0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_meter_grid_power",
+  "platform": "solarman",
+  "original_name": "Grid Power",
+  "unique_id": "01jsyntheticmeter0000000000_grid_power_sensor",
+  "device_id": "dev2",
+  "config_entry_id": "01JSYNTHETICMETER0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_other_battery_power",
+  "platform": "other",
+  "original_name": "Battery Power",
+  "unique_id": "other_battery_power",
+  "device_id": "dev3",
+  "config_entry_id": "01JSYNTHETICOTHER0000000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_p1_energy_import_tariff_1",
+  "platform": "dsmr",
+  "original_name": "",
+  "translation_key": "electricity_used_tariff_1",
+  "capabilities": {
+   "state_class": "total_increasing"
+  },
+  "unique_id": "01jsyntheticp1meter00000000_electricity_used_tariff_1",
+  "device_id": "dev4",
+  "config_entry_id": "01JSYNTHETICP1METER00000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_p1_energy_import_tariff_2",
+  "platform": "dsmr",
+  "original_name": "",
+  "translation_key": "electricity_used_tariff_2",
+  "capabilities": {
+   "state_class": "total_increasing"
+  },
+  "unique_id": "01jsyntheticp1meter00000000_electricity_used_tariff_2",
+  "device_id": "dev4",
+  "config_entry_id": "01JSYNTHETICP1METER00000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_p1_energy_export_tariff_1",
+  "platform": "dsmr",
+  "original_name": "",
+  "translation_key": "electricity_delivered_tariff_1",
+  "capabilities": {
+   "state_class": "total_increasing"
+  },
+  "unique_id": "01jsyntheticp1meter00000000_electricity_delivered_tariff_1",
+  "device_id": "dev4",
+  "config_entry_id": "01JSYNTHETICP1METER00000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_p1_energy_export_tariff_2",
+  "platform": "dsmr",
+  "original_name": "",
+  "translation_key": "electricity_delivered_tariff_2",
+  "capabilities": {
+   "state_class": "total_increasing"
+  },
+  "unique_id": "01jsyntheticp1meter00000000_electricity_delivered_tariff_2",
+  "device_id": "dev4",
+  "config_entry_id": "01JSYNTHETICP1METER00000000"
+ },
+ {
+  "entity_id": "sensor.synthetic_p1_power_consumption",
+  "platform": "dsmr",
+  "original_name": "",
+  "translation_key": "current_electricity_usage",
+  "capabilities": {
+   "state_class": "measurement"
+  },
+  "unique_id": "01jsyntheticp1meter00000000_current_electricity_usage",
+  "device_id": "dev4",
+  "config_entry_id": "01JSYNTHETICP1METER00000000"
+ }
+]

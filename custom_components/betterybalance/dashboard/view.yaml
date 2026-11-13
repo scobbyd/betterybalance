@@ -1,0 +1,180 @@
+# BetteryBalance: the ready-made view in English. Paste it as one view under "views:" of a
+# dashboard, or add a view with this strategy, which builds the same view in your language
+# (English or Dutch):
+#
+#   strategy:
+#     type: custom:betterybalance
+#
+# A title or icon for the strategy view goes under strategy: (title: ..., icon: ...).
+#
+# This file equals viewConfig("en") of www/betterybalance-plan-card.js; a test keeps them equal.
+title: BetteryBalance
+icon: mdi:battery-charging-outline
+type: sections
+max_columns: 2
+sections:
+- type: grid
+  column_span: 2
+  cards:
+  - type: markdown
+    content: |
+      {%- set v = state_attr('sensor.betterybalance_state', 'verdict') -%}
+      {%- set lines = state_attr('sensor.betterybalance_state', 'status_text') -%}
+      ### {{ v if v else 'No decision yet. The first one follows the first price ranking.' }}
+      {% if lines is iterable and lines is not string %}{% for line in lines if line %}
+      <ha-alert alert-type="info">{{ line }}</ha-alert>
+      {%- endfor %}{% endif %}
+  - type: tile
+    entity: binary_sensor.betterybalance_feed_day_ahead
+    name: Day-ahead price feed
+    grid_options:
+      columns: 6
+    visibility:
+    - condition: state
+      entity: binary_sensor.betterybalance_feed_day_ahead
+      state: 'on'
+  - type: tile
+    entity: binary_sensor.betterybalance_feed_ida
+    name: Intraday auction feed
+    grid_options:
+      columns: 6
+    visibility:
+    - condition: state
+      entity: binary_sensor.betterybalance_feed_ida
+      state: 'on'
+  - type: tile
+    entity: binary_sensor.betterybalance_feed_settlement
+    name: Imbalance settlement feed
+    grid_options:
+      columns: 6
+    visibility:
+    - condition: state
+      entity: binary_sensor.betterybalance_feed_settlement
+      state: 'on'
+  - type: tile
+    entity: binary_sensor.betterybalance_feed_live
+    name: Live imbalance price feed
+    grid_options:
+      columns: 6
+    visibility:
+    - condition: state
+      entity: binary_sensor.betterybalance_feed_live
+      state: 'on'
+  - type: tile
+    entity: binary_sensor.betterybalance_feed_irradiance
+    name: Weather forecast feed
+    grid_options:
+      columns: 6
+    visibility:
+    - condition: state
+      entity: binary_sensor.betterybalance_feed_irradiance
+      state: 'on'
+  - type: tile
+    entity: binary_sensor.betterybalance_feed_pack
+    name: Data pack feed
+    grid_options:
+      columns: 6
+    visibility:
+    - condition: state
+      entity: binary_sensor.betterybalance_feed_pack
+      state: 'on'
+  - type: custom:betterybalance-plan-card
+    entity: sensor.betterybalance_plan
+    mode: plan
+  - type: tile
+    entity: select.betterybalance_period
+    features:
+    - type: select-options
+      style: buttons
+    features_position: bottom
+    grid_options:
+      columns: 12
+  - type: conditional
+    conditions:
+    - condition: state
+      entity: select.betterybalance_period
+      state: day
+    card:
+      type: statistics-graph
+      title: Result per day
+      entities:
+      - betterybalance:result
+      chart_type: bar
+      stat_types:
+      - change
+      period: day
+      days_to_show: 30
+      hide_legend: true
+  - type: conditional
+    conditions:
+    - condition: state
+      entity: select.betterybalance_period
+      state: week
+    card:
+      type: statistics-graph
+      title: Result per week
+      entities:
+      - betterybalance:result
+      chart_type: bar
+      stat_types:
+      - change
+      period: week
+      days_to_show: 91
+      hide_legend: true
+  - type: conditional
+    conditions:
+    - condition: state
+      entity: select.betterybalance_period
+      state: month
+    card:
+      type: statistics-graph
+      title: Result per month
+      entities:
+      - betterybalance:result
+      chart_type: bar
+      stat_types:
+      - change
+      period: month
+      days_to_show: 365
+      hide_legend: true
+  - type: conditional
+    conditions:
+    - condition: state
+      entity: select.betterybalance_period
+      state: year
+    card:
+      type: statistics-graph
+      title: Result per year
+      entities:
+      - betterybalance:result
+      chart_type: bar
+      stat_types:
+      - change
+      period: year
+      days_to_show: 1826
+      hide_legend: true
+  - type: custom:betterybalance-plan-card
+    entity: sensor.betterybalance_plan
+    mode: ledger
+  - type: markdown
+    content: |
+      {%- macro eu(x, d=2) -%}{{ ('{:,.' ~ d ~ 'f}').format((x | float(0) | round(d)) + 0) | replace(',', ' ') | replace('.', ',') | replace(' ', '.') }}{%- endmacro -%}
+      {%- set st = states('sensor.betterybalance_backtest') -%}
+      {%- set h = state_attr('sensor.betterybalance_backtest', 'headline') -%}
+      {%- set p = state_attr('sensor.betterybalance_backtest', 'progress') -%}
+      {%- set e = state_attr('sensor.betterybalance_backtest', 'error') -%}
+      ### Backtest
+      {% if st == 'done' and h is mapping -%}
+      Shadow result: {{ eu(h.result_eur) if h.result_eur is number else 'n/a' }} EUR over {{ eu(h.days | int(0), 0) }} days.
+      Mean per day: {{ eu(h.mean_eur_day) if h.mean_eur_day is number else 'n/a' }} EUR, 90 % interval {{ eu(h.lo_eur_day) if h.lo_eur_day is number else 'n/a' }} to {{ eu(h.hi_eur_day) if h.hi_eur_day is number else 'n/a' }} EUR.
+      Value of the shadow's state-of-charge change (beside the result, not added): {{ eu(h.terminal_eur) if h.terminal_eur is number else 'n/a' }} EUR.
+      Missing quarters: {{ eu(h.missing_quarters | int(0), 0) }}.
+
+      {{ h.indicative if h.indicative else '' }}
+      {%- elif st == 'running' -%}
+      {{ 'The backtest runs: {p} % done.'.replace('{p}', eu(p * 100, 0)) if p is number else 'The backtest runs.' }}
+      {%- elif st == 'failed' -%}
+      {{ 'The backtest failed: {e}.'.replace('{e}', e | string) if e else 'The backtest failed.' }}
+      {%- else -%}
+      No backtest yet. Start one in the integration's options: Run the backtest.
+      {%- endif %}

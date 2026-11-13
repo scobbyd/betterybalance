@@ -1,0 +1,8 @@
+data/
+__pycache__/
+.venv/
+*.egg-info/
+build/
+dist/
+.venv-ha/
+betterybalance-pack-*.npz

@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "betterybalance"
+version = "0.3.0"
+requires-python = ">=3.12"
+dependencies = ["numpy>=1.26"]
+
+[project.optional-dependencies]
+tools = ["pandas>=2.1", "scikit-learn>=1.3", "pyyaml>=6", "websockets>=12"]
+dev = ["pytest>=8", "ruff>=0.5"]
+# ha: resolved for homeassistant==2026.10.4 on CPython 3.14.10 (3.14.0-3.14.3 break the recorder_mock autospec)
+ha = ["pytest-homeassistant-custom-component==0.13.375", "home-assistant-frontend==20260930.5"]
+
+[tool.setuptools]
+packages = ["betterybalance", "betterybalance.core", "betterybalance.core.feeds", "betterybalance.models",
+    "betterybalance.core.site", "betterybalance.core.rule", "betterybalance.replay",
+    "betterybalance.live", "betterybalance.verify"]
+
+[tool.setuptools.package-data]
+betterybalance = ["models/*.json", "models/profiles/*.json", "www/*.js", "dashboard/*.yaml",
+    "translations/*.json", "*.json", "services.yaml"]
+
+[tool.setuptools.package-dir]
+betterybalance = "custom_components/betterybalance"
+"betterybalance.core" = "custom_components/betterybalance/core"
+"betterybalance.core.feeds" = "custom_components/betterybalance/core/feeds"
+"betterybalance.models" = "custom_components/betterybalance/models"
+"betterybalance.core.site" = "custom_components/betterybalance/core/site"
+"betterybalance.core.rule" = "custom_components/betterybalance/core/rule"
+"betterybalance.replay" = "custom_components/betterybalance/replay"
+"betterybalance.live" = "custom_components/betterybalance/live"
+"betterybalance.verify" = "custom_components/betterybalance/verify"
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+# asyncio_mode is a pytest-asyncio option: the ha extra installs it, the core venv does not.
+filterwarnings = ["ignore:Unknown config option. asyncio_mode:pytest.PytestConfigWarning"]

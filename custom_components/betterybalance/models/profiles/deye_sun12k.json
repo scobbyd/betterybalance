@@ -1,0 +1,11 @@
+{
+  "name": "Deye SUN-12K-SG04LP3 class",
+  "source": "loss map v2 fits, 2026-09",
+  "p_is": "port_kw",
+  "ac_to_port_w": {"a": 12.1, "b": 3.4},
+  "port_to_ac_w": {"a": 37.9, "b": 2.6},
+  "side_each_way_w": {"a": 3.7, "b": 2.1},
+  "standby_w": 97.0,
+  "charge_ac_max_w": 11300.0,
+  "discharge_ac_max_w": 12200.0
+}
