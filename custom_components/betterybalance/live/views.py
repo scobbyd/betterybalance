@@ -308,7 +308,7 @@ def state_view(
         "committed": bool(d.committed) if d is not None else False,
         "reason": d.reason if d is not None else None,
         "verdict": (
-            CP.verdict(d.reason, d.action, d.kw, _threshold_ct(d), window, lang)
+            CP.verdict(d.reason, d.action, d.kw, _threshold_ct(d), window, lang, now)
             if d is not None
             else None
         ),

@@ -480,7 +480,10 @@ class BetteryCoordinator(DataUpdateCoordinator[dict]):
             store = await hass.async_add_executor_job(self._open)
             now = _wall()
             lc = await hass.async_add_executor_job(self._live_config, store, now)
-            self.site = LiveSite(_LockedStore(store, self._gate), lc)
+            # the site reads its loss profile file: never on the event loop
+            self.site = await hass.async_add_executor_job(
+                LiveSite, _LockedStore(store, self._gate), lc
+            )
             cfg = lc.cfg
             self.runner = FR.FeedRunner(
                 self.site.store, cfg.latitude, cfg.longitude,
@@ -489,7 +492,7 @@ class BetteryCoordinator(DataUpdateCoordinator[dict]):
             async with self._lock:
                 self._new_recorder(now)
                 await hass.async_add_executor_job(self._put_start_switches, now)
-                await hass.async_add_executor_job(self._restart_job, now)
+                await hass.async_add_executor_job(self._restart_job, now, self._soc_now())
                 self._next = max(now // MINUTE_S * MINUTE_S, self.site.next_minute)
                 pack, self._start_pack = self._start_pack, None
                 await hass.async_add_executor_job(self._adopt, pack)
@@ -669,12 +672,18 @@ class BetteryCoordinator(DataUpdateCoordinator[dict]):
         self._timed("minute", site.on_minute, ts, row)
         return 1
 
-    def _restart_job(self, now: int) -> int:
-        """``restore(now)``, then the minutes from ``isp_start(now)`` to the previous wall
-        minute as missing (a minute-1 setup among them, so the rest of the quarter has a
-        ranking); the number of minutes processed."""
+    def _soc_now(self) -> float | None:
+        """The mapped SoC sensor's current state in %, None without a number (on the loop)."""
+        eid = self.mapping.get("soc")
+        return None if eid is None else self._value(self.hass.states.get(eid))
+
+    def _restart_job(self, now: int, soc_pct: float | None) -> int:
+        """``restore(now, soc_pct)`` (``soc_pct``: the SoC sensor read on the loop), then the
+        minutes from ``isp_start(now)`` to the previous wall minute as missing (a minute-1
+        setup among them, so the rest of the quarter has a ranking); the number of minutes
+        processed."""
         site = self.site
-        site.restore(now)
+        site.restore(now, soc_pct)
         return sum(
             self._minute(ts, None)
             for ts in range(site.next_minute, now // MINUTE_S * MINUTE_S, MINUTE_S)
@@ -697,7 +706,9 @@ class BetteryCoordinator(DataUpdateCoordinator[dict]):
                 try:
                     if self._broken or w - self._next > GAP_S:
                         self._new_recorder(now)
-                        done = await hass.async_add_executor_job(self._restart_job, now)
+                        done = await hass.async_add_executor_job(
+                            self._restart_job, now, self._soc_now()
+                        )
                     else:
                         rows = [
                             (ts, self.recorder.close(ts)) for ts in range(self._next, w, MINUTE_S)

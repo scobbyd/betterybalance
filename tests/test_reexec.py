@@ -238,6 +238,19 @@ def test_restart_event_names_the_chain_head():
     assert LG.verify_chain(store.chain(1, store.head()[0]), LG.genesis_hash("install-1")).ok
 
 
+def test_a_sensor_anchored_restart_is_reexecuted_byte_identical():
+    site, store, start = _site()
+    _run(site, start, 20, flows=lambda ts: None)  # nothing valid yet: the shadow never stepped
+    site2 = LS.LiveSite(store, site.lc)
+    site2.restore(start + 1800, 90.0)
+    _run(site2, start + 1800, 60)
+    assert store.last_event("restart")["detail"]["soc_sensor_pct"] == 90.0
+    out = Store(":memory:")
+    out.migrate()
+    r = RX.reexecute(store, site.lc, start, start + 1800 + 3600, out)
+    assert r.differences == [] and out.head() == store.head()
+
+
 @pytest.mark.parametrize(
     "crash, restart, hole", [(22, 22, None), (19, 24, None), (7, 9, None), (22, 22, 18)]
 )

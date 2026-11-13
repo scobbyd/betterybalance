@@ -310,6 +310,14 @@ class Store:
         ).fetchone()
         return int(row[0])
 
+    def has_minutes(self, hi: int, max_epoch: int) -> bool:
+        """Whether a minute row before ``hi`` was written by a run with ``epoch <= max_epoch``."""
+        row = self._db.execute(
+            "SELECT EXISTS(SELECT 1 FROM flows_minute WHERE ts < ? AND epoch <= ?)",
+            (int(hi), int(max_epoch)),
+        ).fetchone()
+        return bool(row[0])
+
     def put_hours(self, table: Table) -> None:
         """Upsert hourly flows; a column the table lacks keeps its stored value."""
         _check(table, ("ts", "step_s", *_FLOW_FLOATS), "flows_hour")

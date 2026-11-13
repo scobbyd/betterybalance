@@ -14,7 +14,7 @@ second store. The site code is the live one; only its inputs change:
   rebookings the stored settlements.
 - The ``events`` log drives the rest at its position: ``restart`` (a fresh ``LiveSite`` on
   the event's ``model_version``, the version the live site restored on, and its ``knobs``,
-  the knobs of the run, and ``restore``),
+  the knobs of the run, and ``restore`` with the event's ``soc_sensor_pct``),
   ``refit`` (the ``learning`` and ``drift`` flags), ``settle`` (the settled
   rebooking of the quarters in ``detail["quarters"]`` at the settlement row each one names in
   ``detail["published_at"]``, ``live.site.settlement_row``, so a row stored later never
@@ -106,6 +106,9 @@ class _SplitStore:
 
     def minute_count(self, lo, hi):  # LiveSite._minute_quarters checks its cache with it
         return self.src.minute_count(lo, hi)
+
+    def has_minutes(self, hi, max_epoch):
+        return self.src.has_minutes(hi, max_epoch)
 
     def hours(self, lo, hi):
         return self.src.hours(lo, hi)
@@ -265,7 +268,7 @@ class _Walk:
             self.lc = replace(self.lc, cfg=with_knobs(self.lc.cfg, knobs))
         self.site = _StoredSite(store, self._lc(self.lc), nowcasts)
         store.event = ev
-        self.site.restore(now)
+        self.site.restore(now, ev["detail"].get("soc_sensor_pct"))
         st = self.site.state
         self.site.state = replace(
             st,

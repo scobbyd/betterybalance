@@ -2,8 +2,9 @@
 
 ``verdict`` renders one trader decision to one line: the plan-2 reason, the action and its
 power, the threshold it cleared and, for a decision without a grid trade, the next trade
-window. ``status_line`` renders one status flag of ``LiveSite.status()``. Numbers go through
-``core.fmt.eu``; times are Europe/Amsterdam ``HH:MM``. An unknown language reads English.
+window (with its day when it does not start today). ``status_line`` renders one status flag of
+``LiveSite.status()``. Numbers go through ``core.fmt.eu``; times are Europe/Amsterdam ``HH:MM``.
+An unknown language reads English.
 """
 
 from __future__ import annotations
@@ -93,6 +94,13 @@ _WINDOW = {
         "discharge": " Volgend verkoopvenster {start} tot {end}.",
     },
 }
+# the day of a window that does not start today (Amsterdam): tomorrow, else the weekday
+_DAY = {
+    "en": ("tomorrow", ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
+                        "Sunday")),
+    "nl": ("morgen", ("maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag",
+                      "zondag")),
+}
 _LAST = {
     "en": {"charge": "Bought {kw} kW at {at}.", "discharge": "Sold {kw} kW at {at}."},
     "nl": {"charge": "{kw} kW gekocht om {at}.", "discharge": "{kw} kW verkocht om {at}."},
@@ -128,14 +136,35 @@ def clock(ts: int) -> str:
     return dt.datetime.fromtimestamp(int(ts), ZONE).strftime("%H:%M")
 
 
+def _day(start: int, now: int | None, lang: str) -> str:
+    """The day word and a space before a window start that is not on ``now``'s Amsterdam day
+    ("tomorrow", else the weekday); empty for today or without ``now``."""
+    if now is None:
+        return ""
+    day = dt.datetime.fromtimestamp(int(start), ZONE).date()
+    today = dt.datetime.fromtimestamp(int(now), ZONE).date()
+    if day == today:
+        return ""
+    tomorrow, weekdays = _DAY[lang]
+    return f"{tomorrow if day == today + dt.timedelta(days=1) else weekdays[day.weekday()]} "
+
+
 def verdict(
-    reason: str, action: str, kw: float, threshold_ct: float, window: dict | None, lang: str
+    reason: str,
+    action: str,
+    kw: float,
+    threshold_ct: float,
+    window: dict | None,
+    lang: str,
+    now: int | None = None,
 ) -> str:
     """One line for a decision (module docstring).
 
     A trade reason with a charge or discharge reads the trade line; every other decision
     reads the reason and the default policy's clause, and the next trade window when
-    ``window`` (``{"start", "end", "side"}``, epoch s) is given.
+    ``window`` (``{"start", "end", "side"}``, epoch s) is given. With ``now`` (epoch s) a
+    window that does not start on the Amsterdam day of ``now`` names its day: "tomorrow",
+    else the weekday.
     """
     lang = _lang(lang)
     power = eu(abs(float(kw)), 1)
@@ -147,7 +176,8 @@ def verdict(
     text = f"{lead}: {body}." if lead else f"{body[0].upper()}{body[1:]}."
     if window is not None and window.get("side") in _WINDOW[lang]:
         text += _WINDOW[lang][window["side"]].format(
-            start=clock(window["start"]), end=clock(window["end"])
+            start=_day(window["start"], now, lang) + clock(window["start"]),
+            end=clock(window["end"]),
         )
     return text
 

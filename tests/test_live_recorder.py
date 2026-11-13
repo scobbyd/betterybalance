@@ -2,7 +2,8 @@ import math
 
 import pytest
 from betterybalance.live.recorder import (
-    MIN_SAMPLES,
+    MAX_HOLD_S,
+    MAX_HOLD_SOC_S,
     OPTIONAL_SERIES,
     REQUIRED_SERIES,
     MinuteRecorder,
@@ -19,7 +20,7 @@ def _feed(rec, eid, value, every=5, start=T0, n=12):
 
 
 def test_series_names():
-    assert MIN_SAMPLES == 4
+    assert MAX_HOLD_S == 150 and MAX_HOLD_SOC_S == 600
     assert REQUIRED_SERIES == ("grid_power", "battery_power", "soc")
     assert OPTIONAL_SERIES == (
         "load_power",
@@ -47,12 +48,106 @@ def test_twelve_samples_integrate_to_energy():
     assert row["soc_min_pct"] == row["soc_max_pct"] == 50.0
 
 
-def test_three_samples_make_a_missing_minute():
+def _slow(rec, start=T0 - 20, soc_start=T0 - 40):
+    """The measured slow box: power every 32 s, SoC every 64 s (state_reported included)."""
+    for k in range(3):
+        rec.sample("b", start + 32 * k, -3000.0)
+    for k in range(2):
+        rec.sample("s", soc_start + 64 * k, 50.0 + k)
+
+
+def test_power_every_32_s_and_soc_every_64_s_is_a_valid_minute():
     rec = MinuteRecorder(MAP, SIGNS)
-    _feed(rec, "g", 1200.0, every=20, n=3)
-    _feed(rec, "b", 0.0)
-    _feed(rec, "s", 50.0)
+    # grid: -1200 W held from T0 - 20 to T0 + 12, +1200 W to T0 + 44, +600 W to the end
+    rec.sample("g", T0 - 20, -1200.0)
+    rec.sample("g", T0 + 12, 1200.0)
+    rec.sample("g", T0 + 44, 600.0)
+    _slow(rec)
+    row = rec.close(T0)
+    assert row is not None
+    assert row["grid_import_kwh"] == pytest.approx((1200.0 * 32 + 600.0 * 16) / 3.6e6)
+    assert row["grid_export_kwh"] == pytest.approx(1200.0 * 12 / 3.6e6)
+    assert row["batt_charge_kwh"] == pytest.approx(0.05) and row["batt_discharge_kwh"] == 0.0
+    # SoC 50 % held to T0 + 24, then 51 %
+    assert row["soc_pct"] == pytest.approx((50.0 * 24 + 51.0 * 36) / 60)
+    assert row["soc_min_pct"] == 50.0 and row["soc_max_pct"] == 51.0
+    assert row["n_samples"] == 1  # the SoC has one sample inside the minute
+
+
+def test_a_minute_without_any_sample_inside_holds_a_fresh_value():
+    rec = MinuteRecorder(MAP, SIGNS)
+    rec.sample("g", T0 - 30, 1200.0)
+    rec.sample("b", T0 - 30, 0.0)
+    rec.sample("s", T0 - 300, 50.0)
+    row = rec.close(T0)
+    assert row is not None and row["n_samples"] == 0
+    assert row["grid_import_kwh"] == pytest.approx(0.02)
+
+
+@pytest.mark.parametrize(
+    "eid, age_at_end, valid",
+    [
+        ("g", MAX_HOLD_S, True),
+        ("g", MAX_HOLD_S + 1, False),
+        ("b", MAX_HOLD_S + 1, False),
+        ("s", MAX_HOLD_SOC_S, True),
+        ("s", MAX_HOLD_SOC_S + 1, False),
+    ],
+)
+def test_a_held_sample_older_than_the_hold_age_makes_the_minute_missing(eid, age_at_end, valid):
+    rec = MinuteRecorder(MAP, SIGNS)
+    fresh = {"g": 1200.0, "b": 0.0, "s": 50.0}
+    for e, v in fresh.items():
+        if e != eid:
+            rec.sample(e, T0 - 10, v)
+    rec.sample(eid, T0 + 60 - age_at_end, fresh[eid])
+    assert (rec.close(T0) is not None) is valid
+
+
+def test_a_stale_value_inside_the_minute_is_missing_even_after_a_fresh_sample():
+    rec = MinuteRecorder(MAP, SIGNS)
+    # the held grid value is 151 s old at T0 + 10, when the next sample arrives
+    rec.sample("g", T0 - 141, 1200.0)
+    rec.sample("g", T0 + 10, 1200.0)
+    _slow(rec)
     assert rec.close(T0) is None
+
+
+def test_an_unavailable_span_at_32_s_is_missing():
+    rec = MinuteRecorder(MAP, SIGNS)
+    rec.sample("g", T0 - 20, 1200.0)
+    rec.sample("g", T0 + 12, None)
+    rec.sample("g", T0 + 44, 1200.0)
+    _slow(rec)
+    assert rec.close(T0) is None
+
+
+def test_a_series_never_seen_is_missing():
+    rec = MinuteRecorder(MAP, SIGNS)
+    rec.sample("g", T0 - 20, 1200.0)
+    rec.sample("b", T0 - 20, 0.0)
+    assert rec.close(T0) is None
+
+
+def test_a_stale_optional_series_gives_nan():
+    rec = MinuteRecorder(MAP, SIGNS)
+    rec.sample("g", T0 - 20, 0.0)
+    _slow(rec)
+    rec.sample("l", T0 - 200, 600.0)
+    assert math.isnan(rec.close(T0)["load_kwh"])
+
+
+def test_the_hold_age_carries_across_a_close():
+    rec = MinuteRecorder(MAP, SIGNS)
+    rec.sample("g", T0 - 20, 1200.0)
+    _slow(rec, soc_start=T0 - 40)
+    assert rec.close(T0) is not None
+    # no grid sample after T0 - 20 (folded into the held value): older than 150 s from T0 + 130
+    rec.sample("b", T0 + 76, -3000.0)
+    rec.sample("s", T0 + 88, 51.0)
+    assert rec.close(T0 + 60) is not None  # 140 s at T0 + 120
+    rec.sample("b", T0 + 140, -3000.0)
+    assert rec.close(T0 + 120) is None
 
 
 def test_unavailable_inside_the_minute_is_missing_never_zero():
@@ -69,12 +164,12 @@ def test_unavailable_inside_the_minute_is_missing_never_zero():
     assert rec.close(T0 + 60) is not None
 
 
-def test_optional_series_missing_leaves_nan():
+def test_optional_series_without_a_value_at_the_start_leaves_nan():
     rec = MinuteRecorder(MAP, SIGNS)
     _feed(rec, "g", 0.0)
     _feed(rec, "b", 0.0)
     _feed(rec, "s", 50.0)
-    _feed(rec, "l", 600.0, n=2)
+    _feed(rec, "l", 600.0, start=T0 + 30, n=2)
     assert math.isnan(rec.close(T0)["load_kwh"])
 
 

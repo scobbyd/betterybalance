@@ -380,7 +380,10 @@ grid trades all land in the grid flows of their quarter, at that quarter's price
   `sensor.betterybalance_result_today` include the provisional ones.
 - A missing quarter counts in no result: when the integration did not see a whole quarter (a
   restart, a gap in the data, one minute without a valid reading), it is booked missing on every
-  path.
+  path. A power or state-of-charge reading is valid in a minute when it is never unavailable in
+  that minute and its last report is never older than 150 seconds (600 seconds for the state of
+  charge). An unchanged value counts as a report, so an inverter that reports every 32 seconds,
+  or a state of charge reported every 64 seconds, gives valid minutes.
 
 Not in the result:
 
@@ -608,8 +611,8 @@ attribute holds the last error message.
   counters, so the grid flows miss that tariff's energy. Go back and pick all of them, or the
   meter's totals.
 - A counter goes unavailable while running: a minute in which a grid counter, the battery power
-  or the state of charge has no valid reading (fewer than 4 samples, or an unavailable state)
-  is a missing minute, and a counter that runs backwards marks the minute missing too. One
+  or the state of charge has no valid reading (an unavailable state, or no report for more than
+  150 seconds, 600 seconds for the state of charge) is a missing minute, and a counter that runs backwards marks the minute missing too. One
   missing minute makes its whole quarter missing on every path, so that quarter counts in no
   result. A counter that stays unavailable leaves every quarter missing until it is back.
 
@@ -645,7 +648,11 @@ The chip's `last_error` says why.
 
 After a restart of Home Assistant, or any gap of more than 15 minutes in the minute loop, the
 integration restores from its store: it re-anchors the shadow battery at its last recorded state
-of charge and books every quarter it did not see as missing, on all three paths. The quarter in
+of charge and books every quarter it did not see as missing, on all three paths. At the first
+start the shadow battery starts at your battery's state of charge sensor, and at the floor only
+when that sensor has no value. Until the shadow battery has seen one valid minute, every restart
+starts it at the sensor again, so a shadow that started at the floor moves to the real state of
+charge at the next restart. The quarter in
 which it comes back is decided again from its start. Missing quarters count in no result; the
 `missing_quarters` attribute of `sensor.betterybalance_result_today` counts today's. At start it
 also books again the settlements of the last 9 days that a restart may have cut off.

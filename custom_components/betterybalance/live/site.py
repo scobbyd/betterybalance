@@ -227,6 +227,18 @@ def stored_inputs(store, w: dict, tables: dict, knobs: Knobs) -> QuarterInputs |
     )
 
 
+def _soc_sensor(pct: float | None) -> float | None:
+    """A SoC sensor value in % as a float, None when it is no value (not finite, outside 0 to
+    100 %)."""
+    if pct is None or isinstance(pct, bool):
+        return None
+    try:
+        v = float(pct)
+    except (TypeError, ValueError):
+        return None
+    return v if math.isfinite(v) and 0.0 <= v <= 100.0 else None
+
+
 # -- the site ---------------------------------------------------------------------------
 
 
@@ -607,13 +619,19 @@ class LiveSite:
         """The minute ``on_minute`` accepts next; None before ``restore``."""
         return self._next
 
-    def restore(self, now: int) -> None:
+    def restore(self, now: int, soc_sensor_pct: float | None = None) -> None:
         """Continue from the store at ``now``: the next minute is ``isp_start(now)``.
 
-        Loads ``registry["site_state"]``, anchors the shadow at the last booked shadow SoC
-        (else the newest recorded SoC, else the floor; clamped to the pack's band), books every
+        Loads ``registry["site_state"]`` and anchors the shadow (clamped to the pack's band).
+        ``soc_sensor_pct`` is the real battery's SoC sensor at ``now`` (None, or a value that
+        is not finite or outside 0 to 100 %, is no value). A shadow that stepped (a minute row
+        of an earlier run exists) anchors at its last booked SoC, else at the sensor. A shadow
+        that never stepped (every minute so far was missing, so its SoC is still its first
+        anchor) anchors at the sensor, else at its last booked SoC. Without either: the newest
+        recorded SoC, else the floor. It books every
         whole quarter after the last booked one up to ``isp_start(now)`` missing on the three
-        paths, puts a ``restart`` event (the anchor SoC, ``head_seq``, the chain head seq
+        paths, puts a ``restart`` event (the anchor SoC, ``soc_sensor_pct`` as used or None:
+        re-execution restores with it, ``head_seq``, the chain head seq
         before the gap bookings, 0 for none: re-execution starts there, the ``model_version``
         in effect: re-execution starts its walk on it, and the ``knobs`` of the run: the
         export and the verifier read them per run) in one transaction
@@ -640,9 +658,16 @@ class LiveSite:
         self._seen_epoch = 0 if prev is None else int(prev["seq"])
         last_minute = None if prev is None else self.store.last_nowcast_ts(prev["seq"])
         q_last, have, shadow = self._last_booked()
-        soc = math.nan
+        booked = math.nan
         if shadow is not None and math.isfinite(shadow["soc_pct"]):
-            soc = shadow["soc_pct"] / 100.0 * pack.capacity_kwh
+            booked = shadow["soc_pct"] / 100.0 * pack.capacity_kwh
+        sensor_pct = _soc_sensor(soc_sensor_pct)
+        sensor = math.nan if sensor_pct is None else sensor_pct / 100.0 * pack.capacity_kwh
+        stepped = self.store.has_minutes(now, self._seen_epoch)
+        soc = next(
+            (x for x in ((booked, sensor) if stepped else (sensor, booked)) if math.isfinite(x)),
+            math.nan,
+        )
         if not math.isfinite(soc):
             soc = self._recorded_soc_kwh(now)
         floor, ceiling = pack.soc_floor * pack.capacity_kwh, pack.soc_ceiling * pack.capacity_kwh
@@ -660,7 +685,8 @@ class LiveSite:
             todo = tuple(p for p in PATHS if not (q == q_last and p in have))
             items += self._book_items(q, missing=True, paths=todo)[0]
         detail = {
-            "soc_kwh": soc, "head_seq": 0 if head is None else head[0], "last_minute": last_minute,
+            "soc_kwh": soc, "soc_sensor_pct": sensor_pct,
+            "head_seq": 0 if head is None else head[0], "last_minute": last_minute,
             "model_version": self.lc.model_version, "knobs": knobs_dict(cfg.knobs),
         }
         # the gap bookings and the restart event in one transaction: both or neither

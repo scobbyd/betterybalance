@@ -44,3 +44,35 @@ def test_every_site_flag_has_a_status_line_in_both_languages():
     assert LS.FLAGS is CP.FLAGS
     for lang in CP.LANGS:
         assert all(CP.status_line(f, lang) for f in LS.FLAGS)
+
+
+def _ams(day: int, hh: int, mm: int) -> int:
+    import datetime as dt
+
+    from betterybalance.core.timegrid import ZONE
+
+    return int(dt.datetime(2026, 11, day, hh, mm, tzinfo=ZONE).timestamp())
+
+
+def test_a_window_on_another_day_names_the_day():
+    now = _ams(2, 13, 50)  # Monday 2 November, Amsterdam
+    for start, en, nl in (
+        (_ams(2, 21, 45), "Next sale window 21:45 to 22:15.",
+         "Volgend verkoopvenster 21:45 tot 22:15."),
+        (_ams(3, 13, 45), "Next sale window tomorrow 13:45 to 14:15.",
+         "Volgend verkoopvenster morgen 13:45 tot 14:15."),
+        (_ams(4, 13, 45), "Next sale window Wednesday 13:45 to 14:15.",
+         "Volgend verkoopvenster woensdag 13:45 tot 14:15."),
+    ):
+        window = {"start": start, "end": start + 1800, "side": "discharge"}
+        assert CP.verdict("wait", "hold", 0.0, 18.4, window, "en", now).endswith(en)
+        assert CP.verdict("wait", "hold", 0.0, 18.4, window, "nl", now).endswith(nl)
+    # the day is the Amsterdam day: 23:30 UTC on Monday is Tuesday 00:30 in Amsterdam
+    start = _ams(3, 0, 30)
+    window = {"start": start, "end": start + 900, "side": "charge"}
+    assert "tomorrow 00:30" in CP.verdict("wait", "hold", 0.0, 18.4, window, "en", now)
+    # every weekday has a name in both languages
+    for d in range(2, 9):
+        w = {"start": _ams(d, 12, 0), "end": _ams(d, 12, 15), "side": "charge"}
+        for lang in CP.LANGS:
+            assert CP.verdict("wait", "hold", 0.0, 18.4, w, lang, _ams(1, 12, 0))

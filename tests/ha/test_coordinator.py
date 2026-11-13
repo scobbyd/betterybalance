@@ -128,15 +128,17 @@ async def test_a_stalled_loop_processes_missed_minutes_as_missing(hass, freezer)
     store = coord.site.store
     rows_before = len(store.minutes(0, 2**40)["ts"])
     assert rows_before >= 1
-    freezer.tick(dt.timedelta(minutes=3))
+    freezer.tick(dt.timedelta(minutes=5))
     async_fire_time_changed(hass)
     await hass.async_block_till_done(wait_background_tasks=True)
     assert [d["reason"] for d in store.decisions(0, 2**40)][-1] == "missing"
-    # the minutes of the stall are processed in order (a nowcast row each); the minute the
-    # stall began in holds its last sample (sample and hold), the two after it have no samples
+    # the minutes of the stall are processed in order (a nowcast row each); the last samples
+    # (30 s into the first minute) hold while they are at most MAX_HOLD_S old, so the two
+    # minutes after the first one are valid and the last two are missing
     w = _now() // 60 * 60
     assert coord.site.next_minute == w
-    assert len(store.nowcasts(w - 180, w)) == 3 and not len(store.minutes(w - 120, w)["ts"])
+    assert len(store.nowcasts(w - 300, w)) == 5 and not len(store.minutes(w - 120, w)["ts"])
+    assert list(store.minutes(w - 300, w)["ts"]) == [w - 300, w - 240, w - 180]
     assert len([e for e in store.events() if e["kind"] == "restart"]) == 1
 
 
@@ -224,6 +226,78 @@ async def test_state_reported_counts_as_a_sample(hass, freezer):
     m = coord.site.store.minutes(w, w + 60)
     assert list(m["n_samples"]) == [5]
     assert m["grid_import_kwh"][0] == pytest.approx(500.0 * 60 / 3.6e6)
+
+
+async def test_power_every_32_s_and_soc_every_64_s_chains_decisions(hass, freezer):
+    """A box whose inverter reports power every 32 s and the SoC every 64 s (measured on a
+    slow Solarman setup) records valid minutes, and its decisions are not missing."""
+    coord = await _setup(hass, freezer)
+    store = coord.site.store
+    power = {k: v for k, v in POWER.items() if k != "soc"}
+    t0 = _now()
+    head0 = 0 if store.head() is None else store.head()[0]
+    for k in range(20 * 15):  # 20 minutes in steps of 4 s
+        await _step(hass, freezer, seconds=4, states=False)
+        if (k + 1) % 8 == 0:
+            _set_states(hass, power)
+        if (k + 1) % 16 == 0:
+            _set_states(hass, {"soc": POWER["soc"]})
+    m = store.minutes(t0, 2**40)
+    assert len(m["ts"]) >= 17 and set(m["n_samples"]) <= {0, 1, 2}
+    later = [d for d in store.decisions(t0 + 180, 2**40)]
+    assert later and all(d["reason"] != "missing" for d in later)
+    assert store.head()[0] > head0
+
+
+async def test_the_loss_profile_file_is_read_outside_the_event_loop(hass, freezer):
+    """The harness skips Home Assistant's read_text check in tests, so a spy records the thread
+    of every profile read: none runs where an event loop runs."""
+    from custom_components.betterybalance.core.site import strings as STR
+    from custom_components.betterybalance.live import site as SITE
+
+    where = []
+
+    def spy(real):
+        def call(*args, **kwargs):
+            try:
+                asyncio.get_running_loop()
+                where.append("loop")
+            except RuntimeError:
+                where.append("executor")
+            return real(*args, **kwargs)
+
+        return call
+
+    with patch.object(SITE, "load_profile", spy(SITE.load_profile)), patch.object(
+        STR, "pv_dc_to_ac_stage", spy(STR.pv_dc_to_ac_stage)
+    ):
+        await _setup(hass, freezer)
+        for _ in range(3 * 12):
+            await _step(hass, freezer)
+    assert where and set(where) == {"executor"}
+
+
+async def test_the_shadow_starts_at_the_soc_sensor_and_re_anchors_until_it_stepped(
+    hass, freezer
+):
+    coord = await _setup(hass, freezer)  # the fixture's SoC sensor reads 50 %
+    store = coord.site.store
+    ev = store.last_event("restart")
+    assert ev["detail"]["soc_sensor_pct"] == 50.0
+    assert ev["detail"]["soc_kwh"] == pytest.approx(0.5 * 30.72)
+    # the grid power stays unavailable: every minute is missing, the shadow never steps
+    entities = _entities(hass)
+    hass.states.async_set(entities["grid_power"], "unavailable")
+    hass.states.async_set(entities["soc"], "100", {"unit_of_measurement": "%"})
+    for _ in range(2 * 12):
+        await _step(hass, freezer, states=False)
+    assert not len(store.minutes(0, 2**40)["ts"])
+    freezer.tick(dt.timedelta(minutes=40))
+    async_fire_time_changed(hass)
+    await hass.async_block_till_done(wait_background_tasks=True)
+    ev = store.last_event("restart")
+    assert ev["detail"]["soc_sensor_pct"] == 100.0
+    assert coord.site.stepper.battery.soc_kwh == pytest.approx(30.72)
 
 
 async def test_grid_counters_in_wh_become_kwh(hass, freezer):
@@ -539,9 +613,9 @@ async def test_a_persistent_minute_failure_backs_off_logs_once_and_raises_an_iss
     restores = []
     real_restore = LiveSite.restore
 
-    def restore(self, now):
+    def restore(self, now, soc_sensor_pct=None):
         restores.append(now)
-        return real_restore(self, now)
+        return real_restore(self, now, soc_sensor_pct)
 
     caplog.clear()
     with patch.object(LiveSite, "on_minute", side_effect=RuntimeError("bad data")), patch.object(

@@ -226,6 +226,61 @@ def test_a_restart_before_the_first_booking_books_the_partial_first_quarter():
     assert len(store.bookings(start, start + 86400)) == 9
 
 
+def _fresh(soc_sensor_pct):
+    """A site on a store without any run, restored with the SoC sensor's current value."""
+    store = Store(":memory:")
+    store.migrate()
+    store.set_meta("install_id", "install-1")
+    lc = LS.LiveConfig(CFG, "install-1", _model(30, 21), "v-test", pack_version="p1")
+    site = LS.LiveSite(store, lc)
+    start = _local_midnight(FIRST_DAY + dt.timedelta(days=21))
+    site.restore(start, soc_sensor_pct)
+    return site, store, start
+
+
+def test_the_first_restore_anchors_at_the_soc_sensor():
+    site, store, _ = _fresh(100.0)
+    assert site.stepper.battery.soc_kwh == pytest.approx(48.0)
+    ev = store.last_event("restart")
+    assert ev["detail"]["soc_kwh"] == pytest.approx(48.0)
+    assert ev["detail"]["soc_sensor_pct"] == 100.0
+
+
+@pytest.mark.parametrize("sensor", [None, math.nan, -3.0, 140.0])
+def test_without_a_valid_soc_sensor_the_first_restore_anchors_at_the_floor(sensor):
+    site, store, _ = _fresh(sensor)
+    assert site.stepper.battery.soc_kwh == pytest.approx(4.8)
+    assert store.last_event("restart")["detail"]["soc_sensor_pct"] is None
+
+
+def test_a_shadow_that_never_stepped_re_anchors_at_the_soc_sensor():
+    # every minute missing: the shadow never stepped, its booked SoC is the first anchor
+    site, store, start = _fresh(None)
+    _run(site, start, 2 * 15, flows=lambda ts: None)
+    assert store.bookings(start, start + 1800)[0]["soc_pct"] == pytest.approx(10.0)
+    site2 = LS.LiveSite(store, site.lc)
+    site2.restore(start + 3600, 80.0)
+    assert site2.stepper.battery.soc_kwh == pytest.approx(0.8 * 48)
+    assert store.last_event("restart")["detail"]["soc_kwh"] == pytest.approx(0.8 * 48)
+    # the gap quarters are booked at the new anchor; the chain still verifies
+    gap = [r for r in store.bookings(start + 1800, start + 3600) if r["path"] == "shadow"]
+    assert len(gap) == 2 and all(r["soc_pct"] == pytest.approx(80.0) for r in gap)
+    assert LG.verify_chain(store.chain(1, store.head()[0]), LG.genesis_hash("install-1")).ok
+    # without a sensor value it keeps its booked SoC, not the floor of a fresh start
+    site3 = LS.LiveSite(store, site.lc)
+    site3.restore(start + 4500, None)
+    assert site3.stepper.battery.soc_kwh == pytest.approx(0.8 * 48)
+
+
+def test_a_shadow_that_stepped_keeps_its_booked_soc_over_the_sensor():
+    site, store, start = _site()
+    _run(site, start, 15)
+    booked = [r for r in store.bookings(start, start + 900) if r["path"] == "shadow"][0]
+    site2 = LS.LiveSite(store, site.lc)
+    site2.restore(start + 1800, 95.0)
+    assert site2.stepper.battery.soc_kwh == pytest.approx(booked["soc_pct"] / 100 * 48)
+
+
 def test_restart_after_setup_ranks_the_running_quarter_from_its_stored_window():
     site, store, start = _site()
     _run(site, start, 15 + 7)  # quarter 2 was set up at its minute 1

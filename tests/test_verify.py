@@ -437,6 +437,25 @@ def test_restart_gap_and_missing_minutes_pass(tmp_path, monkeypatch):
     assert r.ok and r.lines[0].endswith("energies match"), r.lines
 
 
+def test_a_never_stepped_shadow_re_anchored_at_the_sensor_passes(tmp_path, monkeypatch):
+    _negative_take(monkeypatch)
+    site, store, start = _site()
+    _run(site, start, 2 * 15, flows=lambda ts: None)  # every minute missing: never stepped
+    site2 = LS.LiveSite(store, site.lc)
+    site2.restore(start + 2700, 70.0)  # the SoC sensor reads 70 %
+    assert store.last_event("restart")["detail"]["soc_kwh"] == pytest.approx(0.7 * 48)
+    for ts in range(start + 2700, start + 7200, 60):
+        if (ts - start) % 900 == 60:
+            site2.setup_quarter(ts)
+        site2.on_minute(ts, _charging(ts))
+    site2.settle(_settle_rows(store, start, range(8)), start + 90000)
+    _write(tmp_path, X.export_ledger(store, site2.lc, start, start + 7200, True))
+    shadow = [r for r in _read(tmp_path) if r["kind"] == "booking" and r["path"] == "shadow"]
+    assert any(float(r["batt_charge_kwh"] or 0) > 0 for r in shadow)
+    r = V.verify_export(tmp_path)
+    assert r.ok and r.lines[0].endswith("energies match"), r.lines
+
+
 def test_empty_range_passes(tmp_path):
     site, store, start = _site()
     _run(site, start, 15)
